@@ -8,16 +8,19 @@ class SudokuGame {
     var cellsLiveData = MutableLiveData<List<Cell>>()
     val isTakingNotesLiveData = MutableLiveData<Boolean>()
     val highlightedKeysLiveData = MutableLiveData<Set<Int>>()
+    val showCongratulationData = MutableLiveData<Boolean>()
 
     private var selectedRow = -1
     private var selectedCol = -1
     private var isTakingNotes = false
 
     private val board: Board
+    private val data: Data = Data()
 
     init {
-        val cells = List(9 * 9) {i -> Cell(i / 9, i % 9, i % 9)}
-        cells[0].notes = mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        showCongratulationData.postValue(false)
+        val cells = List(9 * 9) {i -> Cell(i / 9, i % 9, data.startData[i / 9][i % 9],
+            data.startData[i / 9][i % 9] != 0)}
         board = Board(9, cells)
         isTakingNotesLiveData.postValue(isTakingNotes)
 
@@ -41,6 +44,25 @@ class SudokuGame {
             cell.value = number
         }
         cellsLiveData.postValue(board.cells)
+        var completed = true;
+        var i = 0;
+        for (cell in board.cells){
+            if (cell.value != data.answer[i / 9][i % 9]){
+                completed = false;
+                break;
+            }
+            i++;
+        }
+        if (completed)
+            showCongratulation()
+    }
+
+    fun showCongratulation(){
+        for (cell in board.cells){
+            cell.value = 0
+            cell.notes.clear()
+        };
+        showCongratulationData.postValue(true)
     }
 
     fun updateSelectedCell(row: Int, col: Int) {

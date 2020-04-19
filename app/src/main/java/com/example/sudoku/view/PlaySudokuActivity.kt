@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -18,18 +19,21 @@ class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.OnTouchListener 
 
     private lateinit var viewModel: PlaySudokuViewModel
     private lateinit var numberButtons: List<Button>
+    private lateinit var congratulatingMessage: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play_sudoku)
 
         sudokuBoardView.registerListener(this)
+        congratulatingMessage = findViewById<TextView>(R.id.congratulatingMessage)
 
         viewModel = ViewModelProviders.of(this).get(PlaySudokuViewModel::class.java)
         viewModel.sudokuGame.selectedCellLiveData.observe(this, Observer { updateSelectedCellUI(it) })
         viewModel.sudokuGame.cellsLiveData.observe(this, Observer { updateCells(it) })
         viewModel.sudokuGame.isTakingNotesLiveData.observe(this, Observer { updateNoteTakingUI(it) })
         viewModel.sudokuGame.highlightedKeysLiveData.observe(this, Observer { updateHighlightedKeys(it) })
+        viewModel.sudokuGame.showCongratulationData.observe(this, Observer {showCongratulatingMessage(it) })
 
         numberButtons = listOf(oneButton, twoButton, threeButton, fourButton, fiveButton, sixButton,
             sevenButton, eightButton, nineButton)
@@ -40,6 +44,11 @@ class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.OnTouchListener 
 
         notesButton.setOnClickListener { viewModel.sudokuGame.changeNoteTakingState() }
         deleteButton.setOnClickListener { viewModel.sudokuGame.delete() }
+    }
+
+    private fun showCongratulatingMessage(isGameCompleted: Boolean?) = isGameCompleted?.let{
+           if (isGameCompleted) congratulatingMessage.text = "Congratulation! You completed puzzle"
+        else congratulatingMessage.text = ""
     }
 
     private fun updateCells(cells: List<Cell>?) = cells?.let {

@@ -113,4 +113,12 @@
             app:srcCompat="@drawable/delete_black"/>
     </GridLayout>
 
+    <TextView
+        android:id="@+id/congratulatingMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/sudokuBoardView"
+        android:layout_marginBottom="25dp"
+        android:text="Congratulation! You completed puzzle" />
+
 </RelativeLayout>
